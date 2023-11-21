@@ -2,25 +2,35 @@
 import React, { useState } from "react";
 import SearchBar from "./components/SearchBar";
 import UrlList from "./components/UrlList";
+import { data } from "autoprefixer";
 
 const App = () => {
   const [searchResults, setSearchResults] = useState([]);
 
-  const handleSearch = (query) => {
-    // Mock data for demonstration purposes
-    const mockUrls = [
-      "https://www.example.com",
-      "https://www.sample.com",
-      "https://www.demo.com",
-    ];
-
-    // Filter URLs based on the search query
-    const filteredUrls = mockUrls.filter((url) =>
-      url.toLowerCase().includes(query.toLowerCase())
-    );
-
-    setSearchResults(filteredUrls);
+  const handleSearch = async (query) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/link/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          URL: query,
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      setSearchResults(data.Links);
+    } catch (error) {
+      console.error("Error fetching URL details", error);
+      // Handle the error as needed, e.g., set an error state.
+    }
   };
+  
 
   return (
     <div className="  bg-gray-900 text-black min-h-screen ">
